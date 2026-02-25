@@ -3,21 +3,21 @@
   {
    "cell_type": "code",
    "execution_count": 1,
-   "id": "8962a6f1",
+   "id": "578f2867",
    "metadata": {
     "_cell_guid": "b1076dfc-b9ad-4769-8c92-a6c4dae69d19",
     "_uuid": "8f2839f25d086af736a60e9eeb907d3b93b6e0e5",
     "execution": {
-     "iopub.execute_input": "2026-02-25T18:53:28.596258Z",
-     "iopub.status.busy": "2026-02-25T18:53:28.595862Z",
-     "iopub.status.idle": "2026-02-25T18:53:29.651433Z",
-     "shell.execute_reply": "2026-02-25T18:53:29.650326Z"
+     "iopub.execute_input": "2026-02-25T21:24:40.942803Z",
+     "iopub.status.busy": "2026-02-25T21:24:40.942261Z",
+     "iopub.status.idle": "2026-02-25T21:24:41.967638Z",
+     "shell.execute_reply": "2026-02-25T21:24:41.966645Z"
     },
     "papermill": {
-     "duration": 1.062693,
-     "end_time": "2026-02-25T18:53:29.653498",
+     "duration": 1.037819,
+     "end_time": "2026-02-25T21:24:41.969867",
      "exception": false,
-     "start_time": "2026-02-25T18:53:28.590805",
+     "start_time": "2026-02-25T21:24:40.932048",
      "status": "completed"
     },
     "tags": []
@@ -44,19 +44,19 @@
   {
    "cell_type": "code",
    "execution_count": 2,
-   "id": "d0bea986",
+   "id": "ab789b92",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2026-02-25T18:53:29.661827Z",
-     "iopub.status.busy": "2026-02-25T18:53:29.661100Z",
-     "iopub.status.idle": "2026-02-25T18:53:31.035365Z",
-     "shell.execute_reply": "2026-02-25T18:53:31.034482Z"
+     "iopub.execute_input": "2026-02-25T21:24:41.985375Z",
+     "iopub.status.busy": "2026-02-25T21:24:41.984241Z",
+     "iopub.status.idle": "2026-02-25T21:24:43.251327Z",
+     "shell.execute_reply": "2026-02-25T21:24:43.250296Z"
     },
     "papermill": {
-     "duration": 1.380527,
-     "end_time": "2026-02-25T18:53:31.037335",
+     "duration": 1.276989,
+     "end_time": "2026-02-25T21:24:43.253510",
      "exception": false,
-     "start_time": "2026-02-25T18:53:29.656808",
+     "start_time": "2026-02-25T21:24:41.976521",
      "status": "completed"
     },
     "tags": []
@@ -263,147 +263,55 @@
   {
    "cell_type": "code",
    "execution_count": 3,
-   "id": "72fcdfe2",
+   "id": "b4bdcde0",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2026-02-25T18:53:31.045188Z",
-     "iopub.status.busy": "2026-02-25T18:53:31.044860Z",
-     "iopub.status.idle": "2026-02-25T18:53:31.237466Z",
-     "shell.execute_reply": "2026-02-25T18:53:31.236547Z"
+     "iopub.execute_input": "2026-02-25T21:24:43.268778Z",
+     "iopub.status.busy": "2026-02-25T21:24:43.268393Z",
+     "iopub.status.idle": "2026-02-25T21:24:43.849527Z",
+     "shell.execute_reply": "2026-02-25T21:24:43.848567Z"
     },
     "papermill": {
-     "duration": 0.198879,
-     "end_time": "2026-02-25T18:53:31.239623",
+     "duration": 0.590624,
+     "end_time": "2026-02-25T21:24:43.851693",
      "exception": false,
-     "start_time": "2026-02-25T18:53:31.040744",
+     "start_time": "2026-02-25T21:24:43.261069",
      "status": "completed"
     },
     "tags": []
    },
    "outputs": [],
    "source": [
-    "df_nonull = df.dropna()"
+    "#Ghost Revenue is revenue that we cannot trace back to a client.\n",
+    "#We treat our Ghost clients as one client and we name it Anon ( for Anonymous).\n",
+    "df[\"CustomerID\"] = df[\"CustomerID\"].fillna(\"Anon\")\n",
+    "#For unknown invoice number and stock code and country we could simply set that to -1, because it isnt used in out calculations(Those that have a negative quantity and are unknown we set them to C-1 so that we know its a return).\n",
+    "df.loc[(df['InvoiceNo'].isna()) & (df['Quantity'] > 0), 'InvoiceNo'] = -1\n",
+    "df.loc[(df['InvoiceNo'].isna()) & (df['Quantity'] < 0), 'InvoiceNo'] = \"C-1\"\n",
+    "df[\"StockCode\"] = df[\"StockCode\"].fillna(-1)\n",
+    "#Same thing for Country and Description but we set to an empty string as they are strings.\n",
+    "df[\"Country\"] = df[\"Country\"].fillna(\"\")\n",
+    "df[\"Description\"] = df[\"Description\"].fillna(\"\")\n",
+    "#For other empty values we can simply remove the row, because setting it to a values like 0 is unreliable and could impact the sum.\n",
+    "df = df.dropna()"
    ]
   },
   {
    "cell_type": "code",
    "execution_count": 4,
-   "id": "1448bf76",
+   "id": "6f63a996",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2026-02-25T18:53:31.247957Z",
-     "iopub.status.busy": "2026-02-25T18:53:31.247051Z",
-     "iopub.status.idle": "2026-02-25T18:53:31.257337Z",
-     "shell.execute_reply": "2026-02-25T18:53:31.256331Z"
+     "iopub.execute_input": "2026-02-25T21:24:43.867478Z",
+     "iopub.status.busy": "2026-02-25T21:24:43.867101Z",
+     "iopub.status.idle": "2026-02-25T21:24:43.881306Z",
+     "shell.execute_reply": "2026-02-25T21:24:43.880215Z"
     },
     "papermill": {
-     "duration": 0.016324,
-     "end_time": "2026-02-25T18:53:31.259158",
+     "duration": 0.025038,
+     "end_time": "2026-02-25T21:24:43.883947",
      "exception": false,
-     "start_time": "2026-02-25T18:53:31.242834",
-     "status": "completed"
-    },
-    "tags": []
-   },
-   "outputs": [
-    {
-     "name": "stderr",
-     "output_type": "stream",
-     "text": [
-      "/tmp/ipykernel_17/3910504472.py:1: SettingWithCopyWarning: \n",
-      "A value is trying to be set on a copy of a slice from a DataFrame.\n",
-      "Try using .loc[row_indexer,col_indexer] = value instead\n",
-      "\n",
-      "See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy\n",
-      "  df_nonull['Spent'] = df_nonull['Quantity'] * df_nonull['UnitPrice']\n"
-     ]
-    }
-   ],
-   "source": [
-    "df_nonull['Spent'] = df_nonull['Quantity'] * df_nonull['UnitPrice']"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 5,
-   "id": "af9d9c9e",
-   "metadata": {
-    "execution": {
-     "iopub.execute_input": "2026-02-25T18:53:31.268709Z",
-     "iopub.status.busy": "2026-02-25T18:53:31.267776Z",
-     "iopub.status.idle": "2026-02-25T18:53:32.266542Z",
-     "shell.execute_reply": "2026-02-25T18:53:32.265281Z"
-    },
-    "papermill": {
-     "duration": 1.005326,
-     "end_time": "2026-02-25T18:53:32.268931",
-     "exception": false,
-     "start_time": "2026-02-25T18:53:31.263605",
-     "status": "completed"
-    },
-    "tags": []
-   },
-   "outputs": [
-    {
-     "data": {
-      "text/plain": [
-       "np.float64(1447682.1199999973)"
-      ]
-     },
-     "execution_count": 5,
-     "metadata": {},
-     "output_type": "execute_result"
-    }
-   ],
-   "source": [
-    "df_null = pd.read_csv('/kaggle/input/ecommerce-data/data.csv', encoding='unicode_escape')\n",
-    "df_null['Spent'] = df_null['Quantity'] * df_null['UnitPrice']\n",
-    "nullDiff = df_null['Spent'].sum() - df_nonull['Spent'].sum()\n",
-    "nullDiff"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 6,
-   "id": "1a4580e3",
-   "metadata": {
-    "execution": {
-     "iopub.execute_input": "2026-02-25T18:53:32.277529Z",
-     "iopub.status.busy": "2026-02-25T18:53:32.276854Z",
-     "iopub.status.idle": "2026-02-25T18:53:32.569280Z",
-     "shell.execute_reply": "2026-02-25T18:53:32.568407Z"
-    },
-    "papermill": {
-     "duration": 0.299186,
-     "end_time": "2026-02-25T18:53:32.571463",
-     "exception": false,
-     "start_time": "2026-02-25T18:53:32.272277",
-     "status": "completed"
-    },
-    "tags": []
-   },
-   "outputs": [],
-   "source": [
-    "df[\"CustomerID\"] = df[\"CustomerID\"].fillna(\"Anon\")\n",
-    "df = df.fillna(0)"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 7,
-   "id": "af51e548",
-   "metadata": {
-    "execution": {
-     "iopub.execute_input": "2026-02-25T18:53:32.579880Z",
-     "iopub.status.busy": "2026-02-25T18:53:32.579250Z",
-     "iopub.status.idle": "2026-02-25T18:53:32.593321Z",
-     "shell.execute_reply": "2026-02-25T18:53:32.592478Z"
-    },
-    "papermill": {
-     "duration": 0.020319,
-     "end_time": "2026-02-25T18:53:32.595207",
-     "exception": false,
-     "start_time": "2026-02-25T18:53:32.574888",
+     "start_time": "2026-02-25T21:24:43.858909",
      "status": "completed"
     },
     "tags": []
@@ -597,7 +505,7 @@
        "[541909 rows x 8 columns]"
       ]
      },
-     "execution_count": 7,
+     "execution_count": 4,
      "metadata": {},
      "output_type": "execute_result"
     }
@@ -608,25 +516,474 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 8,
-   "id": "14d5f087",
+   "execution_count": 5,
+   "id": "eea97ea2",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2026-02-25T18:53:32.604179Z",
-     "iopub.status.busy": "2026-02-25T18:53:32.603388Z",
-     "iopub.status.idle": "2026-02-25T18:53:32.688393Z",
-     "shell.execute_reply": "2026-02-25T18:53:32.687537Z"
+     "iopub.execute_input": "2026-02-25T21:24:43.898859Z",
+     "iopub.status.busy": "2026-02-25T21:24:43.898488Z",
+     "iopub.status.idle": "2026-02-25T21:24:43.906970Z",
+     "shell.execute_reply": "2026-02-25T21:24:43.905945Z"
     },
     "papermill": {
-     "duration": 0.091581,
-     "end_time": "2026-02-25T18:53:32.690372",
+     "duration": 0.018558,
+     "end_time": "2026-02-25T21:24:43.909160",
      "exception": false,
-     "start_time": "2026-02-25T18:53:32.598791",
+     "start_time": "2026-02-25T21:24:43.890602",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "#We need to calculate the number of money spent on each transaction, for that we add another column called \"Spent\" which contains Quantity multiplied by UnitPrice\n",
+    "df[\"Spent\"] = df[\"Quantity\"] * df[\"UnitPrice\"]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "id": "5d89712a",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-02-25T21:24:43.923187Z",
+     "iopub.status.busy": "2026-02-25T21:24:43.922858Z",
+     "iopub.status.idle": "2026-02-25T21:24:43.937845Z",
+     "shell.execute_reply": "2026-02-25T21:24:43.936579Z"
+    },
+    "papermill": {
+     "duration": 0.024426,
+     "end_time": "2026-02-25T21:24:43.939917",
+     "exception": false,
+     "start_time": "2026-02-25T21:24:43.915491",
      "status": "completed"
     },
     "tags": []
    },
    "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>InvoiceNo</th>\n",
+       "      <th>StockCode</th>\n",
+       "      <th>Description</th>\n",
+       "      <th>Quantity</th>\n",
+       "      <th>InvoiceDate</th>\n",
+       "      <th>UnitPrice</th>\n",
+       "      <th>CustomerID</th>\n",
+       "      <th>Country</th>\n",
+       "      <th>Spent</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>536365</td>\n",
+       "      <td>85123A</td>\n",
+       "      <td>WHITE HANGING HEART T-LIGHT HOLDER</td>\n",
+       "      <td>6</td>\n",
+       "      <td>12/1/2010 8:26</td>\n",
+       "      <td>2.55</td>\n",
+       "      <td>17850.0</td>\n",
+       "      <td>United Kingdom</td>\n",
+       "      <td>15.30</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>536365</td>\n",
+       "      <td>71053</td>\n",
+       "      <td>WHITE METAL LANTERN</td>\n",
+       "      <td>6</td>\n",
+       "      <td>12/1/2010 8:26</td>\n",
+       "      <td>3.39</td>\n",
+       "      <td>17850.0</td>\n",
+       "      <td>United Kingdom</td>\n",
+       "      <td>20.34</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>536365</td>\n",
+       "      <td>84406B</td>\n",
+       "      <td>CREAM CUPID HEARTS COAT HANGER</td>\n",
+       "      <td>8</td>\n",
+       "      <td>12/1/2010 8:26</td>\n",
+       "      <td>2.75</td>\n",
+       "      <td>17850.0</td>\n",
+       "      <td>United Kingdom</td>\n",
+       "      <td>22.00</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>536365</td>\n",
+       "      <td>84029G</td>\n",
+       "      <td>KNITTED UNION FLAG HOT WATER BOTTLE</td>\n",
+       "      <td>6</td>\n",
+       "      <td>12/1/2010 8:26</td>\n",
+       "      <td>3.39</td>\n",
+       "      <td>17850.0</td>\n",
+       "      <td>United Kingdom</td>\n",
+       "      <td>20.34</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>536365</td>\n",
+       "      <td>84029E</td>\n",
+       "      <td>RED WOOLLY HOTTIE WHITE HEART.</td>\n",
+       "      <td>6</td>\n",
+       "      <td>12/1/2010 8:26</td>\n",
+       "      <td>3.39</td>\n",
+       "      <td>17850.0</td>\n",
+       "      <td>United Kingdom</td>\n",
+       "      <td>20.34</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>...</th>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>541904</th>\n",
+       "      <td>581587</td>\n",
+       "      <td>22613</td>\n",
+       "      <td>PACK OF 20 SPACEBOY NAPKINS</td>\n",
+       "      <td>12</td>\n",
+       "      <td>12/9/2011 12:50</td>\n",
+       "      <td>0.85</td>\n",
+       "      <td>12680.0</td>\n",
+       "      <td>France</td>\n",
+       "      <td>10.20</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>541905</th>\n",
+       "      <td>581587</td>\n",
+       "      <td>22899</td>\n",
+       "      <td>CHILDREN'S APRON DOLLY GIRL</td>\n",
+       "      <td>6</td>\n",
+       "      <td>12/9/2011 12:50</td>\n",
+       "      <td>2.10</td>\n",
+       "      <td>12680.0</td>\n",
+       "      <td>France</td>\n",
+       "      <td>12.60</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>541906</th>\n",
+       "      <td>581587</td>\n",
+       "      <td>23254</td>\n",
+       "      <td>CHILDRENS CUTLERY DOLLY GIRL</td>\n",
+       "      <td>4</td>\n",
+       "      <td>12/9/2011 12:50</td>\n",
+       "      <td>4.15</td>\n",
+       "      <td>12680.0</td>\n",
+       "      <td>France</td>\n",
+       "      <td>16.60</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>541907</th>\n",
+       "      <td>581587</td>\n",
+       "      <td>23255</td>\n",
+       "      <td>CHILDRENS CUTLERY CIRCUS PARADE</td>\n",
+       "      <td>4</td>\n",
+       "      <td>12/9/2011 12:50</td>\n",
+       "      <td>4.15</td>\n",
+       "      <td>12680.0</td>\n",
+       "      <td>France</td>\n",
+       "      <td>16.60</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>541908</th>\n",
+       "      <td>581587</td>\n",
+       "      <td>22138</td>\n",
+       "      <td>BAKING SET 9 PIECE RETROSPOT</td>\n",
+       "      <td>3</td>\n",
+       "      <td>12/9/2011 12:50</td>\n",
+       "      <td>4.95</td>\n",
+       "      <td>12680.0</td>\n",
+       "      <td>France</td>\n",
+       "      <td>14.85</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "<p>541909 rows × 9 columns</p>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "       InvoiceNo StockCode                          Description  Quantity  \\\n",
+       "0         536365    85123A   WHITE HANGING HEART T-LIGHT HOLDER         6   \n",
+       "1         536365     71053                  WHITE METAL LANTERN         6   \n",
+       "2         536365    84406B       CREAM CUPID HEARTS COAT HANGER         8   \n",
+       "3         536365    84029G  KNITTED UNION FLAG HOT WATER BOTTLE         6   \n",
+       "4         536365    84029E       RED WOOLLY HOTTIE WHITE HEART.         6   \n",
+       "...          ...       ...                                  ...       ...   \n",
+       "541904    581587     22613          PACK OF 20 SPACEBOY NAPKINS        12   \n",
+       "541905    581587     22899         CHILDREN'S APRON DOLLY GIRL          6   \n",
+       "541906    581587     23254        CHILDRENS CUTLERY DOLLY GIRL          4   \n",
+       "541907    581587     23255      CHILDRENS CUTLERY CIRCUS PARADE         4   \n",
+       "541908    581587     22138        BAKING SET 9 PIECE RETROSPOT          3   \n",
+       "\n",
+       "            InvoiceDate  UnitPrice CustomerID         Country  Spent  \n",
+       "0        12/1/2010 8:26       2.55    17850.0  United Kingdom  15.30  \n",
+       "1        12/1/2010 8:26       3.39    17850.0  United Kingdom  20.34  \n",
+       "2        12/1/2010 8:26       2.75    17850.0  United Kingdom  22.00  \n",
+       "3        12/1/2010 8:26       3.39    17850.0  United Kingdom  20.34  \n",
+       "4        12/1/2010 8:26       3.39    17850.0  United Kingdom  20.34  \n",
+       "...                 ...        ...        ...             ...    ...  \n",
+       "541904  12/9/2011 12:50       0.85    12680.0          France  10.20  \n",
+       "541905  12/9/2011 12:50       2.10    12680.0          France  12.60  \n",
+       "541906  12/9/2011 12:50       4.15    12680.0          France  16.60  \n",
+       "541907  12/9/2011 12:50       4.15    12680.0          France  16.60  \n",
+       "541908  12/9/2011 12:50       4.95    12680.0          France  14.85  \n",
+       "\n",
+       "[541909 rows x 9 columns]"
+      ]
+     },
+     "execution_count": 6,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "id": "88401d7d",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-02-25T21:24:43.955000Z",
+     "iopub.status.busy": "2026-02-25T21:24:43.954308Z",
+     "iopub.status.idle": "2026-02-25T21:24:44.387852Z",
+     "shell.execute_reply": "2026-02-25T21:24:44.386767Z"
+    },
+    "papermill": {
+     "duration": 0.443733,
+     "end_time": "2026-02-25T21:24:44.390160",
+     "exception": false,
+     "start_time": "2026-02-25T21:24:43.946427",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "#Now we will split the dataframe, sales and returns. When InvoiceNo starts with C its a return.\n",
+    "df_returns = df[df['InvoiceNo'].str.startswith('C', na=False)]\n",
+    "df_sales = df[~df['InvoiceNo'].str.startswith('C', na=False)]\n",
+    "#We then delete every sale that hase a negative quantity, and every return with a positive quantity, because these should not exist.\n",
+    "df_returns = df[df['Quantity'] < 0]\n",
+    "df_sales = df[df['Quantity'] > 0]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "id": "6cf706cb",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-02-25T21:24:44.405159Z",
+     "iopub.status.busy": "2026-02-25T21:24:44.404283Z",
+     "iopub.status.idle": "2026-02-25T21:24:44.410360Z",
+     "shell.execute_reply": "2026-02-25T21:24:44.409308Z"
+    },
+    "papermill": {
+     "duration": 0.015912,
+     "end_time": "2026-02-25T21:24:44.412556",
+     "exception": false,
+     "start_time": "2026-02-25T21:24:44.396644",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "The number of returns is 10624, the number of sales is 531285, and the number of transactions is 541909\n",
+      "Returns are 1.96% of total transactions\n"
+     ]
+    }
+   ],
+   "source": [
+    "n_sales = len(df_sales)\n",
+    "n_returns = len(df_returns)\n",
+    "n_total = n_returns+n_sales\n",
+    "print(f\"The number of returns is {n_returns}, the number of sales is {n_sales}, and the number of transactions is {n_returns+n_sales}\")\n",
+    "print(f\"Returns are {n_returns*100/n_total:.2f}% of total transactions\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "id": "96401a68",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-02-25T21:24:44.428025Z",
+     "iopub.status.busy": "2026-02-25T21:24:44.427241Z",
+     "iopub.status.idle": "2026-02-25T21:24:44.435651Z",
+     "shell.execute_reply": "2026-02-25T21:24:44.434287Z"
+    },
+    "papermill": {
+     "duration": 0.018714,
+     "end_time": "2026-02-25T21:24:44.437816",
+     "exception": false,
+     "start_time": "2026-02-25T21:24:44.419102",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Revenue in sales is : 10644560.424$, while money lost in returns is : 896812.49$\n",
+      "Which means total is 9747747.934$\n"
+     ]
+    }
+   ],
+   "source": [
+    "rev_sales = df_sales[\"Spent\"].sum()\n",
+    "rev_returns = df_returns[\"Spent\"].sum()\n",
+    "rev_total = rev_sales+rev_returns\n",
+    "print(f\"Revenue in sales is : {rev_sales}$, while money lost in returns is : {abs(rev_returns)}$\")\n",
+    "print(f\"Which means total is {rev_total}$\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 10,
+   "id": "6af86858",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-02-25T21:24:44.452522Z",
+     "iopub.status.busy": "2026-02-25T21:24:44.452162Z",
+     "iopub.status.idle": "2026-02-25T21:24:44.516757Z",
+     "shell.execute_reply": "2026-02-25T21:24:44.515566Z"
+    },
+    "papermill": {
+     "duration": 0.074443,
+     "end_time": "2026-02-25T21:24:44.518772",
+     "exception": false,
+     "start_time": "2026-02-25T21:24:44.444329",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Number of anonymous transactions : 135080, 133361 of them being sales, and 1719 in returns\n",
+      "Which is 24.93% of our total transactions\n"
+     ]
+    }
+   ],
+   "source": [
+    "#Now we see how much of out customers are unknown\n",
+    "df_anon_sales = df_sales[df_sales['CustomerID'] == \"Anon\"]\n",
+    "df_anon_returns = df_returns[df_returns['CustomerID'] == \"Anon\"]\n",
+    "\n",
+    "n_anon_sales = len(df_anon_sales)\n",
+    "n_anon_returns = len(df_anon_returns)\n",
+    "n_anon_total = n_anon_sales+n_anon_returns\n",
+    "print(f\"Number of anonymous transactions : {n_anon_sales+n_anon_returns}, {n_anon_sales} of them being sales, and {n_anon_returns} in returns\")\n",
+    "print(f\"Which is {n_anon_total*100/n_total:.2f}% of our total transactions\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 11,
+   "id": "b803ae60",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-02-25T21:24:44.534118Z",
+     "iopub.status.busy": "2026-02-25T21:24:44.533191Z",
+     "iopub.status.idle": "2026-02-25T21:24:44.540901Z",
+     "shell.execute_reply": "2026-02-25T21:24:44.539616Z"
+    },
+    "papermill": {
+     "duration": 0.0175,
+     "end_time": "2026-02-25T21:24:44.542985",
+     "exception": false,
+     "start_time": "2026-02-25T21:24:44.525485",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Revenue in sales is : 1733152.52$, while money lost in returns is : 285470.4$\n",
+      "Which means total is 1447682.12$, which is 14.85% of out total revenue\n"
+     ]
+    }
+   ],
+   "source": [
+    "rev_anon_sales = df_anon_sales[\"Spent\"].sum()\n",
+    "rev_anon_returns = df_anon_returns[\"Spent\"].sum()\n",
+    "rev_anon_total = rev_anon_sales+rev_anon_returns\n",
+    "print(f\"Revenue in sales is : {rev_anon_sales}$, while money lost in returns is : {abs(rev_anon_returns)}$\")\n",
+    "print(f\"Which means total is {rev_anon_total}$, which is {rev_anon_total*100/rev_total:.2f}% of out total revenue\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 12,
+   "id": "ddbbc6bb",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-02-25T21:24:44.558595Z",
+     "iopub.status.busy": "2026-02-25T21:24:44.558221Z",
+     "iopub.status.idle": "2026-02-25T21:24:44.675012Z",
+     "shell.execute_reply": "2026-02-25T21:24:44.674057Z"
+    },
+    "papermill": {
+     "duration": 0.12745,
+     "end_time": "2026-02-25T21:24:44.677089",
+     "exception": false,
+     "start_time": "2026-02-25T21:24:44.549639",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "We have exactly 4373 different known clients, here is the top 10 revenue makers :\n"
+     ]
+    },
     {
      "data": {
       "text/html": [
@@ -661,126 +1018,161 @@
        "  </thead>\n",
        "  <tbody>\n",
        "    <tr>\n",
-       "      <th>12346.0</th>\n",
-       "      <td>0</td>\n",
-       "      <td>2.08</td>\n",
-       "      <td>0.00</td>\n",
-       "    </tr>\n",
-       "    <tr>\n",
-       "      <th>12347.0</th>\n",
-       "      <td>2458</td>\n",
-       "      <td>481.21</td>\n",
-       "      <td>4310.00</td>\n",
-       "    </tr>\n",
-       "    <tr>\n",
-       "      <th>12348.0</th>\n",
-       "      <td>2341</td>\n",
-       "      <td>178.71</td>\n",
-       "      <td>1797.24</td>\n",
-       "    </tr>\n",
-       "    <tr>\n",
-       "      <th>12349.0</th>\n",
-       "      <td>631</td>\n",
-       "      <td>605.10</td>\n",
-       "      <td>1757.55</td>\n",
-       "    </tr>\n",
-       "    <tr>\n",
-       "      <th>12350.0</th>\n",
-       "      <td>197</td>\n",
-       "      <td>65.30</td>\n",
-       "      <td>334.40</td>\n",
-       "    </tr>\n",
-       "    <tr>\n",
-       "      <th>...</th>\n",
-       "      <td>...</td>\n",
-       "      <td>...</td>\n",
-       "      <td>...</td>\n",
-       "    </tr>\n",
-       "    <tr>\n",
-       "      <th>18281.0</th>\n",
-       "      <td>54</td>\n",
-       "      <td>39.36</td>\n",
-       "      <td>80.82</td>\n",
-       "    </tr>\n",
-       "    <tr>\n",
-       "      <th>18282.0</th>\n",
-       "      <td>98</td>\n",
-       "      <td>62.68</td>\n",
-       "      <td>176.60</td>\n",
-       "    </tr>\n",
-       "    <tr>\n",
-       "      <th>18283.0</th>\n",
-       "      <td>1397</td>\n",
-       "      <td>1220.93</td>\n",
-       "      <td>2094.88</td>\n",
-       "    </tr>\n",
-       "    <tr>\n",
-       "      <th>18287.0</th>\n",
-       "      <td>1586</td>\n",
-       "      <td>104.55</td>\n",
-       "      <td>1837.28</td>\n",
-       "    </tr>\n",
-       "    <tr>\n",
        "      <th>Anon</th>\n",
        "      <td>269562</td>\n",
        "      <td>1090984.01</td>\n",
        "      <td>1447682.12</td>\n",
        "    </tr>\n",
+       "    <tr>\n",
+       "      <th>14646.0</th>\n",
+       "      <td>196719</td>\n",
+       "      <td>5400.21</td>\n",
+       "      <td>279489.02</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>18102.0</th>\n",
+       "      <td>64122</td>\n",
+       "      <td>5159.73</td>\n",
+       "      <td>256438.49</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>17450.0</th>\n",
+       "      <td>69029</td>\n",
+       "      <td>3320.09</td>\n",
+       "      <td>187482.17</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>14911.0</th>\n",
+       "      <td>77180</td>\n",
+       "      <td>31060.66</td>\n",
+       "      <td>132572.62</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>12415.0</th>\n",
+       "      <td>77242</td>\n",
+       "      <td>2499.82</td>\n",
+       "      <td>123725.45</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>14156.0</th>\n",
+       "      <td>57025</td>\n",
+       "      <td>6544.29</td>\n",
+       "      <td>113384.14</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>17511.0</th>\n",
+       "      <td>63012</td>\n",
+       "      <td>2607.08</td>\n",
+       "      <td>88125.38</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>16684.0</th>\n",
+       "      <td>49390</td>\n",
+       "      <td>709.93</td>\n",
+       "      <td>65892.08</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>13694.0</th>\n",
+       "      <td>61803</td>\n",
+       "      <td>1163.81</td>\n",
+       "      <td>62653.10</td>\n",
+       "    </tr>\n",
        "  </tbody>\n",
        "</table>\n",
-       "<p>4373 rows × 3 columns</p>\n",
        "</div>"
       ],
       "text/plain": [
        "            Quantity   UnitPrice       Spent\n",
        "CustomerID                                  \n",
-       "12346.0            0        2.08        0.00\n",
-       "12347.0         2458      481.21     4310.00\n",
-       "12348.0         2341      178.71     1797.24\n",
-       "12349.0          631      605.10     1757.55\n",
-       "12350.0          197       65.30      334.40\n",
-       "...              ...         ...         ...\n",
-       "18281.0           54       39.36       80.82\n",
-       "18282.0           98       62.68      176.60\n",
-       "18283.0         1397     1220.93     2094.88\n",
-       "18287.0         1586      104.55     1837.28\n",
        "Anon          269562  1090984.01  1447682.12\n",
-       "\n",
-       "[4373 rows x 3 columns]"
+       "14646.0       196719     5400.21   279489.02\n",
+       "18102.0        64122     5159.73   256438.49\n",
+       "17450.0        69029     3320.09   187482.17\n",
+       "14911.0        77180    31060.66   132572.62\n",
+       "12415.0        77242     2499.82   123725.45\n",
+       "14156.0        57025     6544.29   113384.14\n",
+       "17511.0        63012     2607.08    88125.38\n",
+       "16684.0        49390      709.93    65892.08\n",
+       "13694.0        61803     1163.81    62653.10"
       ]
      },
-     "execution_count": 8,
+     "execution_count": 12,
      "metadata": {},
      "output_type": "execute_result"
     }
    ],
    "source": [
-    "df['Spent'] = df['Quantity'] * df['UnitPrice']\n",
-    "r = df.groupby([\"CustomerID\"]).sum(\"Spents\")\n",
-    "r"
+    "#Now we calculate our Top customers revenue\n",
+    "spent_per_customer = df.groupby(\"CustomerID\").sum(\"Spent\")\n",
+    "spc_sorted = spent_per_customer.sort_values(by=\"Spent\", ascending=False)\n",
+    "n_clients = df[\"CustomerID\"].nunique()\n",
+    "print(f\"We have exactly {n_clients} different known clients, here is the top 10 revenue makers :\")\n",
+    "spc_sorted.head(10)"
    ]
   },
   {
    "cell_type": "code",
-   "execution_count": 9,
-   "id": "754cda2a",
+   "execution_count": 13,
+   "id": "620170e6",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2026-02-25T18:53:32.699891Z",
-     "iopub.status.busy": "2026-02-25T18:53:32.699233Z",
-     "iopub.status.idle": "2026-02-25T18:53:32.739424Z",
-     "shell.execute_reply": "2026-02-25T18:53:32.738585Z"
+     "iopub.execute_input": "2026-02-25T21:24:44.692931Z",
+     "iopub.status.busy": "2026-02-25T21:24:44.692226Z",
+     "iopub.status.idle": "2026-02-25T21:24:44.699216Z",
+     "shell.execute_reply": "2026-02-25T21:24:44.698154Z"
     },
     "papermill": {
-     "duration": 0.047338,
-     "end_time": "2026-02-25T18:53:32.741559",
+     "duration": 0.017225,
+     "end_time": "2026-02-25T21:24:44.701234",
      "exception": false,
-     "start_time": "2026-02-25T18:53:32.694221",
+     "start_time": "2026-02-25T21:24:44.684009",
      "status": "completed"
     },
     "tags": []
    },
    "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Our best seller is Anon, making 14.85% of our total revenue\n",
+      "Our top 10 most revenue makers make 2757444.57, which is 28.29% of our total revenue\n"
+     ]
+    }
+   ],
+   "source": [
+    "print(f\"Our best seller is {spc_sorted.iloc[0].name}, making {spc_sorted.iloc[0]['Spent']*100/rev_total:.2f}% of our total revenue\")\n",
+    "print(f\"Our top 10 most revenue makers make {spc_sorted.head(10)[\"Spent\"].sum()}, which is {spc_sorted.head(10)[\"Spent\"].sum()*100/rev_total:.2f}% of our total revenue\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 14,
+   "id": "68cc464d",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-02-25T21:24:44.717097Z",
+     "iopub.status.busy": "2026-02-25T21:24:44.716757Z",
+     "iopub.status.idle": "2026-02-25T21:24:44.729419Z",
+     "shell.execute_reply": "2026-02-25T21:24:44.728460Z"
+    },
+    "papermill": {
+     "duration": 0.023331,
+     "end_time": "2026-02-25T21:24:44.731517",
+     "exception": false,
+     "start_time": "2026-02-25T21:24:44.708186",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Our 5% clients are 218\n"
+     ]
+    },
     {
      "data": {
       "text/html": [
@@ -903,32 +1295,255 @@
        "[218 rows x 3 columns]"
       ]
      },
-     "execution_count": 9,
+     "execution_count": 14,
      "metadata": {},
      "output_type": "execute_result"
     }
    ],
    "source": [
-    "nTop = r.sort_values(by=\"Spent\", ascending=False).head(int(df['CustomerID'].nunique()* 5 / 100 ))\n",
-    "nTop"
+    "#Now for 5% people:\n",
+    "nb_5perc = int(5*n_clients/100)\n",
+    "print(f\"Our 5% clients are {nb_5perc}\")\n",
+    "spc_sorted.head(nb_5perc)"
    ]
   },
   {
    "cell_type": "code",
-   "execution_count": 10,
-   "id": "01e529b0",
+   "execution_count": 15,
+   "id": "ec69a832",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2026-02-25T18:53:32.752037Z",
-     "iopub.status.busy": "2026-02-25T18:53:32.751186Z",
-     "iopub.status.idle": "2026-02-25T18:53:32.789458Z",
-     "shell.execute_reply": "2026-02-25T18:53:32.788611Z"
+     "iopub.execute_input": "2026-02-25T21:24:44.748789Z",
+     "iopub.status.busy": "2026-02-25T21:24:44.748466Z",
+     "iopub.status.idle": "2026-02-25T21:24:44.754689Z",
+     "shell.execute_reply": "2026-02-25T21:24:44.753445Z"
     },
     "papermill": {
-     "duration": 0.045522,
-     "end_time": "2026-02-25T18:53:32.791496",
+     "duration": 0.017933,
+     "end_time": "2026-02-25T21:24:44.756813",
      "exception": false,
-     "start_time": "2026-02-25T18:53:32.745974",
+     "start_time": "2026-02-25T21:24:44.738880",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "They make 5469455.93, which is 56.11% of our total revenue\n"
+     ]
+    }
+   ],
+   "source": [
+    "print(f\"They make {spc_sorted.head(nb_5perc)[\"Spent\"].sum()}, which is {spc_sorted.head(nb_5perc)[\"Spent\"].sum()*100/rev_total:.2f}% of our total revenue\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 16,
+   "id": "785a8eeb",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-02-25T21:24:44.773703Z",
+     "iopub.status.busy": "2026-02-25T21:24:44.773323Z",
+     "iopub.status.idle": "2026-02-25T21:24:45.485737Z",
+     "shell.execute_reply": "2026-02-25T21:24:45.484671Z"
+    },
+    "papermill": {
+     "duration": 0.723966,
+     "end_time": "2026-02-25T21:24:45.488146",
+     "exception": false,
+     "start_time": "2026-02-25T21:24:44.764180",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Without the unknown clints we have :\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Quantity</th>\n",
+       "      <th>UnitPrice</th>\n",
+       "      <th>Spent</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>CustomerID</th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>14646.0</th>\n",
+       "      <td>196719</td>\n",
+       "      <td>5400.21</td>\n",
+       "      <td>279489.02</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>18102.0</th>\n",
+       "      <td>64122</td>\n",
+       "      <td>5159.73</td>\n",
+       "      <td>256438.49</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>17450.0</th>\n",
+       "      <td>69029</td>\n",
+       "      <td>3320.09</td>\n",
+       "      <td>187482.17</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>14911.0</th>\n",
+       "      <td>77180</td>\n",
+       "      <td>31060.66</td>\n",
+       "      <td>132572.62</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>12415.0</th>\n",
+       "      <td>77242</td>\n",
+       "      <td>2499.82</td>\n",
+       "      <td>123725.45</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>14156.0</th>\n",
+       "      <td>57025</td>\n",
+       "      <td>6544.29</td>\n",
+       "      <td>113384.14</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>17511.0</th>\n",
+       "      <td>63012</td>\n",
+       "      <td>2607.08</td>\n",
+       "      <td>88125.38</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>16684.0</th>\n",
+       "      <td>49390</td>\n",
+       "      <td>709.93</td>\n",
+       "      <td>65892.08</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>13694.0</th>\n",
+       "      <td>61803</td>\n",
+       "      <td>1163.81</td>\n",
+       "      <td>62653.10</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>15311.0</th>\n",
+       "      <td>37720</td>\n",
+       "      <td>6267.75</td>\n",
+       "      <td>59419.34</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "            Quantity  UnitPrice      Spent\n",
+       "CustomerID                                \n",
+       "14646.0       196719    5400.21  279489.02\n",
+       "18102.0        64122    5159.73  256438.49\n",
+       "17450.0        69029    3320.09  187482.17\n",
+       "14911.0        77180   31060.66  132572.62\n",
+       "12415.0        77242    2499.82  123725.45\n",
+       "14156.0        57025    6544.29  113384.14\n",
+       "17511.0        63012    2607.08   88125.38\n",
+       "16684.0        49390     709.93   65892.08\n",
+       "13694.0        61803    1163.81   62653.10\n",
+       "15311.0        37720    6267.75   59419.34"
+      ]
+     },
+     "execution_count": 16,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "#If we remove Anon from the equation\n",
+    "spent_per_customer_noAnon = df[~df[\"CustomerID\"].str.contains(\"Anon\", na=False)].groupby(\"CustomerID\").sum(\"Spent\")\n",
+    "spc_sorted_noAnon = spent_per_customer_noAnon.sort_values(by=\"Spent\", ascending=False)\n",
+    "print(\"Without the unknown clints we have :\")\n",
+    "spc_sorted_noAnon.head(10)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 17,
+   "id": "bdde45b5",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-02-25T21:24:45.505100Z",
+     "iopub.status.busy": "2026-02-25T21:24:45.504744Z",
+     "iopub.status.idle": "2026-02-25T21:24:45.510951Z",
+     "shell.execute_reply": "2026-02-25T21:24:45.509957Z"
+    },
+    "papermill": {
+     "duration": 0.016921,
+     "end_time": "2026-02-25T21:24:45.512870",
+     "exception": false,
+     "start_time": "2026-02-25T21:24:45.495949",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Our best seller is 14646.0, making 2.87% of our total revenue\n",
+      "Our top 10 most revenue makers make 1369181.7900000003, which is 14.05% of our total revenue\n"
+     ]
+    }
+   ],
+   "source": [
+    "print(f\"Our best seller is {spc_sorted_noAnon.iloc[0].name}, making {spc_sorted_noAnon.iloc[0]['Spent']*100/rev_total:.2f}% of our total revenue\")\n",
+    "print(f\"Our top 10 most revenue makers make {spc_sorted_noAnon.head(10)[\"Spent\"].sum()}, which is {spc_sorted_noAnon.head(10)[\"Spent\"].sum()*100/rev_total:.2f}% of our total revenue\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 18,
+   "id": "8df25f47",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-02-25T21:24:45.530124Z",
+     "iopub.status.busy": "2026-02-25T21:24:45.529770Z",
+     "iopub.status.idle": "2026-02-25T21:24:45.543067Z",
+     "shell.execute_reply": "2026-02-25T21:24:45.542159Z"
+    },
+    "papermill": {
+     "duration": 0.024514,
+     "end_time": "2026-02-25T21:24:45.544977",
+     "exception": false,
+     "start_time": "2026-02-25T21:24:45.520463",
      "status": "completed"
     },
     "tags": []
@@ -1056,32 +1671,951 @@
        "[218 rows x 3 columns]"
       ]
      },
-     "execution_count": 10,
+     "execution_count": 18,
      "metadata": {},
      "output_type": "execute_result"
     }
    ],
    "source": [
-    "nTopNoAnon = r.sort_values(by=\"Spent\", ascending=False).iloc[1:].head(int(df['CustomerID'].nunique()* 5 / 100 ))\n",
-    "nTopNoAnon"
+    "#Now for 5% people:\n",
+    "spc_sorted_noAnon.head(nb_5perc)"
    ]
   },
   {
    "cell_type": "code",
-   "execution_count": 11,
-   "id": "31e706e6",
+   "execution_count": 19,
+   "id": "c378ddd9",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2026-02-25T18:53:32.801810Z",
-     "iopub.status.busy": "2026-02-25T18:53:32.801114Z",
-     "iopub.status.idle": "2026-02-25T18:53:32.807363Z",
-     "shell.execute_reply": "2026-02-25T18:53:32.806426Z"
+     "iopub.execute_input": "2026-02-25T21:24:45.562124Z",
+     "iopub.status.busy": "2026-02-25T21:24:45.561780Z",
+     "iopub.status.idle": "2026-02-25T21:24:45.567786Z",
+     "shell.execute_reply": "2026-02-25T21:24:45.566790Z"
     },
     "papermill": {
-     "duration": 0.0134,
-     "end_time": "2026-02-25T18:53:32.809187",
+     "duration": 0.017473,
+     "end_time": "2026-02-25T21:24:45.570077",
      "exception": false,
-     "start_time": "2026-02-25T18:53:32.795787",
+     "start_time": "2026-02-25T21:24:45.552604",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "They make 4027430.56, which is 41.32% of our total revenue\n"
+     ]
+    }
+   ],
+   "source": [
+    "print(f\"They make {spc_sorted_noAnon.head(nb_5perc)[\"Spent\"].sum()}, which is {spc_sorted_noAnon.head(nb_5perc)[\"Spent\"].sum()*100/rev_total:.2f}% of our total revenue\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 20,
+   "id": "5104f06d",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-02-25T21:24:45.587178Z",
+     "iopub.status.busy": "2026-02-25T21:24:45.586837Z",
+     "iopub.status.idle": "2026-02-25T21:24:45.606708Z",
+     "shell.execute_reply": "2026-02-25T21:24:45.605670Z"
+    },
+    "papermill": {
+     "duration": 0.030943,
+     "end_time": "2026-02-25T21:24:45.608736",
+     "exception": false,
+     "start_time": "2026-02-25T21:24:45.577793",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Quantity</th>\n",
+       "      <th>UnitPrice</th>\n",
+       "      <th>Spent</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Description</th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>PAPER CRAFT , LITTLE BIRDIE</th>\n",
+       "      <td>-80995</td>\n",
+       "      <td>2.08</td>\n",
+       "      <td>-168469.60</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>MEDIUM CERAMIC TOP STORAGE JAR</th>\n",
+       "      <td>-74494</td>\n",
+       "      <td>11.66</td>\n",
+       "      <td>-77479.64</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>printing smudges/thrown away</th>\n",
+       "      <td>-19200</td>\n",
+       "      <td>0.00</td>\n",
+       "      <td>0.00</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Unsaleable, destroyed.</th>\n",
+       "      <td>-15644</td>\n",
+       "      <td>0.00</td>\n",
+       "      <td>0.00</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>check</th>\n",
+       "      <td>-13247</td>\n",
+       "      <td>0.00</td>\n",
+       "      <td>0.00</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>...</th>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3 TIER SWEETHEART GARDEN SHELF</th>\n",
+       "      <td>-1</td>\n",
+       "      <td>35.95</td>\n",
+       "      <td>-35.95</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>12 MESSAGE CARDS WITH ENVELOPES</th>\n",
+       "      <td>-1</td>\n",
+       "      <td>1.65</td>\n",
+       "      <td>-1.65</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>12 IVORY ROSE PEG PLACE SETTINGS</th>\n",
+       "      <td>-1</td>\n",
+       "      <td>1.25</td>\n",
+       "      <td>-1.25</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>12 EGG HOUSE PAINTED WOOD</th>\n",
+       "      <td>-1</td>\n",
+       "      <td>12.75</td>\n",
+       "      <td>-12.75</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>TRELLIS COAT RACK</th>\n",
+       "      <td>-1</td>\n",
+       "      <td>4.95</td>\n",
+       "      <td>-4.95</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "<p>2110 rows × 3 columns</p>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                                  Quantity  UnitPrice      Spent\n",
+       "Description                                                     \n",
+       "PAPER CRAFT , LITTLE BIRDIE         -80995       2.08 -168469.60\n",
+       "MEDIUM CERAMIC TOP STORAGE JAR      -74494      11.66  -77479.64\n",
+       "printing smudges/thrown away        -19200       0.00       0.00\n",
+       "Unsaleable, destroyed.              -15644       0.00       0.00\n",
+       "check                               -13247       0.00       0.00\n",
+       "...                                    ...        ...        ...\n",
+       "3 TIER SWEETHEART GARDEN SHELF          -1      35.95     -35.95\n",
+       "12 MESSAGE CARDS WITH ENVELOPES         -1       1.65      -1.65\n",
+       "12 IVORY ROSE PEG PLACE SETTINGS        -1       1.25      -1.25\n",
+       "12 EGG HOUSE PAINTED WOOD               -1      12.75     -12.75\n",
+       " TRELLIS COAT RACK                      -1       4.95      -4.95\n",
+       "\n",
+       "[2110 rows x 3 columns]"
+      ]
+     },
+     "execution_count": 20,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df_return_qtt = df_returns.groupby(\"Description\").sum(\"Quantity\")\n",
+    "df_return_qtt_sorted = df_return_qtt.sort_values(\"Quantity\")\n",
+    "df_return_qtt_sorted_na = df_return_qtt_sorted[df_return_qtt_sorted.index!=\"\"]\n",
+    "df_return_qtt_sorted_na"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 21,
+   "id": "653092ef",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-02-25T21:24:45.626054Z",
+     "iopub.status.busy": "2026-02-25T21:24:45.625728Z",
+     "iopub.status.idle": "2026-02-25T21:24:45.632429Z",
+     "shell.execute_reply": "2026-02-25T21:24:45.631543Z"
+    },
+    "papermill": {
+     "duration": 0.018054,
+     "end_time": "2026-02-25T21:24:45.634715",
+     "exception": false,
+     "start_time": "2026-02-25T21:24:45.616661",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "46156 of the time we dont know what is returned\n",
+      "The element that was returned the most has the following description 'PAPER CRAFT , LITTLE BIRDIE', which was returned 80995.0 times\n"
+     ]
+    }
+   ],
+   "source": [
+    "print(f\"{abs(df_return_qtt_sorted[df_return_qtt_sorted.index==\"\"][\"Quantity\"].iloc[0])} of the time we dont know what is returned\")\n",
+    "print(f\"The element that was returned the most has the following description '{df_return_qtt_sorted_na.iloc[0].name}', which was returned {abs(df_return_qtt_sorted_na.iloc[0][\"Quantity\"])} times\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 22,
+   "id": "a8efd18c",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-02-25T21:24:45.652399Z",
+     "iopub.status.busy": "2026-02-25T21:24:45.652043Z",
+     "iopub.status.idle": "2026-02-25T21:24:45.671531Z",
+     "shell.execute_reply": "2026-02-25T21:24:45.670565Z"
+    },
+    "papermill": {
+     "duration": 0.030921,
+     "end_time": "2026-02-25T21:24:45.673599",
+     "exception": false,
+     "start_time": "2026-02-25T21:24:45.642678",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Quantity</th>\n",
+       "      <th>UnitPrice</th>\n",
+       "      <th>Spent</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>CustomerID</th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>16446.0</th>\n",
+       "      <td>-80995</td>\n",
+       "      <td>2.08</td>\n",
+       "      <td>-168469.60</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>12346.0</th>\n",
+       "      <td>-74215</td>\n",
+       "      <td>1.04</td>\n",
+       "      <td>-77183.60</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>15838.0</th>\n",
+       "      <td>-9361</td>\n",
+       "      <td>11.55</td>\n",
+       "      <td>-292.32</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>15749.0</th>\n",
+       "      <td>-9014</td>\n",
+       "      <td>15.80</td>\n",
+       "      <td>-22998.40</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>16029.0</th>\n",
+       "      <td>-8060</td>\n",
+       "      <td>15388.75</td>\n",
+       "      <td>-30032.23</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>...</th>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>15713.0</th>\n",
+       "      <td>-1</td>\n",
+       "      <td>9.95</td>\n",
+       "      <td>-9.95</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>15719.0</th>\n",
+       "      <td>-1</td>\n",
+       "      <td>1.65</td>\n",
+       "      <td>-1.65</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>15724.0</th>\n",
+       "      <td>-1</td>\n",
+       "      <td>5.95</td>\n",
+       "      <td>-5.95</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>12365.0</th>\n",
+       "      <td>-1</td>\n",
+       "      <td>320.69</td>\n",
+       "      <td>-320.69</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>18277.0</th>\n",
+       "      <td>-1</td>\n",
+       "      <td>12.75</td>\n",
+       "      <td>-12.75</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "<p>1589 rows × 3 columns</p>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "            Quantity  UnitPrice      Spent\n",
+       "CustomerID                                \n",
+       "16446.0       -80995       2.08 -168469.60\n",
+       "12346.0       -74215       1.04  -77183.60\n",
+       "15838.0        -9361      11.55    -292.32\n",
+       "15749.0        -9014      15.80  -22998.40\n",
+       "16029.0        -8060   15388.75  -30032.23\n",
+       "...              ...        ...        ...\n",
+       "15713.0           -1       9.95      -9.95\n",
+       "15719.0           -1       1.65      -1.65\n",
+       "15724.0           -1       5.95      -5.95\n",
+       "12365.0           -1     320.69    -320.69\n",
+       "18277.0           -1      12.75     -12.75\n",
+       "\n",
+       "[1589 rows x 3 columns]"
+      ]
+     },
+     "execution_count": 22,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df_return_customers = df_returns.groupby(\"CustomerID\").sum(\"Quantity\")\n",
+    "df_return_customers_sorted = df_return_customers.sort_values(\"Quantity\")\n",
+    "df_return_customers_sorted_noAnon = df_return_customers_sorted[df_return_customers_sorted.index != \"Anon\"]\n",
+    "df_return_customers_sorted_noAnon"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 23,
+   "id": "fb30a425",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-02-25T21:24:45.691376Z",
+     "iopub.status.busy": "2026-02-25T21:24:45.691029Z",
+     "iopub.status.idle": "2026-02-25T21:24:45.697967Z",
+     "shell.execute_reply": "2026-02-25T21:24:45.697006Z"
+    },
+    "papermill": {
+     "duration": 0.018874,
+     "end_time": "2026-02-25T21:24:45.700522",
+     "exception": false,
+     "start_time": "2026-02-25T21:24:45.681648",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Unknown people returned 209723 articles\n",
+      "Our serial returner is 16446.0, that has returned 80995.0 objects\n"
+     ]
+    }
+   ],
+   "source": [
+    "print(f\"Unknown people returned {abs(df_return_customers_sorted[df_return_customers_sorted.index==\"Anon\"][\"Quantity\"].iloc[0])} articles\")\n",
+    "print(f\"Our serial returner is {df_return_customers_sorted_noAnon.iloc[0].name}, that has returned {abs(df_return_customers_sorted_noAnon.iloc[0][\"Quantity\"])} objects\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 24,
+   "id": "87eb0dac",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-02-25T21:24:45.718678Z",
+     "iopub.status.busy": "2026-02-25T21:24:45.718301Z",
+     "iopub.status.idle": "2026-02-25T21:24:46.600501Z",
+     "shell.execute_reply": "2026-02-25T21:24:46.599220Z"
+    },
+    "papermill": {
+     "duration": 0.89409,
+     "end_time": "2026-02-25T21:24:46.602776",
+     "exception": false,
+     "start_time": "2026-02-25T21:24:45.708686",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "/tmp/ipykernel_17/3303119898.py:4: SettingWithCopyWarning: \n",
+      "A value is trying to be set on a copy of a slice from a DataFrame.\n",
+      "Try using .loc[row_indexer,col_indexer] = value instead\n",
+      "\n",
+      "See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy\n",
+      "  df_sales[\"InvoiceDate\"] = pd.to_datetime(df[\"InvoiceDate\"], format=\"%m/%d/%Y %H:%M\")\n"
+     ]
+    },
+    {
+     "data": {
+      "text/plain": [
+       "InvoiceDate\n",
+       "<class 'pandas._libs.tslibs.timestamps.Timestamp'>    531285\n",
+       "Name: count, dtype: int64"
+      ]
+     },
+     "execution_count": 24,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "#Now we move on to The Temporal Rhythm\n",
+    "df_sales[\"InvoiceDate\"].apply(type).value_counts()\n",
+    "#We can see that our InvoiceDate are of type string, which means they should be manually converted to dates\n",
+    "df_sales[\"InvoiceDate\"] = pd.to_datetime(df[\"InvoiceDate\"], format=\"%m/%d/%Y %H:%M\")\n",
+    "#Now we check the types again\n",
+    "df_sales[\"InvoiceDate\"].apply(type).value_counts()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 25,
+   "id": "4c206ea0",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-02-25T21:24:46.622708Z",
+     "iopub.status.busy": "2026-02-25T21:24:46.621600Z",
+     "iopub.status.idle": "2026-02-25T21:24:46.677089Z",
+     "shell.execute_reply": "2026-02-25T21:24:46.676246Z"
+    },
+    "papermill": {
+     "duration": 0.06799,
+     "end_time": "2026-02-25T21:24:46.679174",
+     "exception": false,
+     "start_time": "2026-02-25T21:24:46.611184",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "#Now we check KPIs\n",
+    "df_sales_hour = df_sales.groupby(df_sales[\"InvoiceDate\"].dt.hour)\n",
+    "df_sales_day = df_sales.groupby(df_sales[\"InvoiceDate\"].dt.day)\n",
+    "df_sales_month = df_sales.groupby(df_sales[\"InvoiceDate\"].dt.month)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 26,
+   "id": "d560137c",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-02-25T21:24:46.698442Z",
+     "iopub.status.busy": "2026-02-25T21:24:46.698075Z",
+     "iopub.status.idle": "2026-02-25T21:24:46.735964Z",
+     "shell.execute_reply": "2026-02-25T21:24:46.734907Z"
+    },
+    "papermill": {
+     "duration": 0.049875,
+     "end_time": "2026-02-25T21:24:46.738025",
+     "exception": false,
+     "start_time": "2026-02-25T21:24:46.688150",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Quantity</th>\n",
+       "      <th>UnitPrice</th>\n",
+       "      <th>Spent</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>InvoiceDate</th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>12</th>\n",
+       "      <td>853925</td>\n",
+       "      <td>246700.910</td>\n",
+       "      <td>1444245.880</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>10</th>\n",
+       "      <td>819902</td>\n",
+       "      <td>197139.281</td>\n",
+       "      <td>1446742.701</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>13</th>\n",
+       "      <td>710968</td>\n",
+       "      <td>244457.690</td>\n",
+       "      <td>1265736.300</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>11</th>\n",
+       "      <td>677913</td>\n",
+       "      <td>207252.680</td>\n",
+       "      <td>1239954.440</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>15</th>\n",
+       "      <td>651481</td>\n",
+       "      <td>338327.560</td>\n",
+       "      <td>1352972.180</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "             Quantity   UnitPrice        Spent\n",
+       "InvoiceDate                                   \n",
+       "12             853925  246700.910  1444245.880\n",
+       "10             819902  197139.281  1446742.701\n",
+       "13             710968  244457.690  1265736.300\n",
+       "11             677913  207252.680  1239954.440\n",
+       "15             651481  338327.560  1352972.180"
+      ]
+     },
+     "execution_count": 26,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df_sales_hour_qtt_sorted = df_sales_hour.sum(\"Quantity\").sort_values(by=\"Quantity\", ascending=False)\n",
+    "df_sales_hour_qtt_sorted.head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 27,
+   "id": "0d7404ad",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-02-25T21:24:46.759211Z",
+     "iopub.status.busy": "2026-02-25T21:24:46.758195Z",
+     "iopub.status.idle": "2026-02-25T21:24:46.764594Z",
+     "shell.execute_reply": "2026-02-25T21:24:46.763413Z"
+    },
+    "papermill": {
+     "duration": 0.019681,
+     "end_time": "2026-02-25T21:24:46.766734",
+     "exception": false,
+     "start_time": "2026-02-25T21:24:46.747053",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Top orders are at 12:00, Peaking at 853925.0 orders\n"
+     ]
+    }
+   ],
+   "source": [
+    "print(f\"Top orders are at {df_sales_hour_qtt_sorted.iloc[0].name}:00, Peaking at {df_sales_hour_qtt_sorted.iloc[0][\"Quantity\"]} orders\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 28,
+   "id": "80abba06",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-02-25T21:24:46.787123Z",
+     "iopub.status.busy": "2026-02-25T21:24:46.786794Z",
+     "iopub.status.idle": "2026-02-25T21:24:46.822439Z",
+     "shell.execute_reply": "2026-02-25T21:24:46.821459Z"
+    },
+    "papermill": {
+     "duration": 0.048457,
+     "end_time": "2026-02-25T21:24:46.824597",
+     "exception": false,
+     "start_time": "2026-02-25T21:24:46.776140",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Quantity</th>\n",
+       "      <th>UnitPrice</th>\n",
+       "      <th>Spent</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>InvoiceDate</th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>9</th>\n",
+       "      <td>270471</td>\n",
+       "      <td>70987.13</td>\n",
+       "      <td>519712.24</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>18</th>\n",
+       "      <td>269242</td>\n",
+       "      <td>76069.87</td>\n",
+       "      <td>436160.03</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>7</th>\n",
+       "      <td>240891</td>\n",
+       "      <td>104618.76</td>\n",
+       "      <td>532786.78</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>5</th>\n",
+       "      <td>232901</td>\n",
+       "      <td>81640.45</td>\n",
+       "      <td>413157.76</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>20</th>\n",
+       "      <td>218271</td>\n",
+       "      <td>70525.23</td>\n",
+       "      <td>411819.66</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "             Quantity  UnitPrice      Spent\n",
+       "InvoiceDate                                \n",
+       "9              270471   70987.13  519712.24\n",
+       "18             269242   76069.87  436160.03\n",
+       "7              240891  104618.76  532786.78\n",
+       "5              232901   81640.45  413157.76\n",
+       "20             218271   70525.23  411819.66"
+      ]
+     },
+     "execution_count": 28,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df_sales_day_qtt_sorted = df_sales_day.sum(\"Quantity\").sort_values(by=\"Quantity\", ascending=False)\n",
+    "df_sales_day_qtt_sorted.head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 29,
+   "id": "a2086a16",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-02-25T21:24:46.843487Z",
+     "iopub.status.busy": "2026-02-25T21:24:46.843135Z",
+     "iopub.status.idle": "2026-02-25T21:24:46.849161Z",
+     "shell.execute_reply": "2026-02-25T21:24:46.848140Z"
+    },
+    "papermill": {
+     "duration": 0.018221,
+     "end_time": "2026-02-25T21:24:46.851377",
+     "exception": false,
+     "start_time": "2026-02-25T21:24:46.833156",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Top orders are the day number 9 of the month, Peaking at 270471.0 orders\n"
+     ]
+    }
+   ],
+   "source": [
+    "print(f\"Top orders are the day number {df_sales_day_qtt_sorted.iloc[0].name} of the month, Peaking at {df_sales_day_qtt_sorted.iloc[0][\"Quantity\"]} orders\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 30,
+   "id": "8879546c",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-02-25T21:24:46.870498Z",
+     "iopub.status.busy": "2026-02-25T21:24:46.870125Z",
+     "iopub.status.idle": "2026-02-25T21:24:46.905430Z",
+     "shell.execute_reply": "2026-02-25T21:24:46.904333Z"
+    },
+    "papermill": {
+     "duration": 0.047829,
+     "end_time": "2026-02-25T21:24:46.907857",
+     "exception": false,
+     "start_time": "2026-02-25T21:24:46.860028",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Quantity</th>\n",
+       "      <th>UnitPrice</th>\n",
+       "      <th>Spent</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>InvoiceDate</th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>11</th>\n",
+       "      <td>771598</td>\n",
+       "      <td>300525.350</td>\n",
+       "      <td>1509496.330</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>12</th>\n",
+       "      <td>677368</td>\n",
+       "      <td>301464.210</td>\n",
+       "      <td>1462538.820</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>10</th>\n",
+       "      <td>628745</td>\n",
+       "      <td>223426.870</td>\n",
+       "      <td>1154979.300</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>9</th>\n",
+       "      <td>575416</td>\n",
+       "      <td>174774.462</td>\n",
+       "      <td>1058590.172</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>8</th>\n",
+       "      <td>425016</td>\n",
+       "      <td>116329.860</td>\n",
+       "      <td>737014.260</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "             Quantity   UnitPrice        Spent\n",
+       "InvoiceDate                                   \n",
+       "11             771598  300525.350  1509496.330\n",
+       "12             677368  301464.210  1462538.820\n",
+       "10             628745  223426.870  1154979.300\n",
+       "9              575416  174774.462  1058590.172\n",
+       "8              425016  116329.860   737014.260"
+      ]
+     },
+     "execution_count": 30,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df_sales_month_qtt_sorted= df_sales_month.sum(\"Quantity\").sort_values(by=\"Quantity\", ascending=False)\n",
+    "df_sales_month_qtt_sorted.head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 31,
+   "id": "e3e2a6b3",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-02-25T21:24:46.927862Z",
+     "iopub.status.busy": "2026-02-25T21:24:46.927499Z",
+     "iopub.status.idle": "2026-02-25T21:24:46.933571Z",
+     "shell.execute_reply": "2026-02-25T21:24:46.932473Z"
+    },
+    "papermill": {
+     "duration": 0.018995,
+     "end_time": "2026-02-25T21:24:46.936174",
+     "exception": false,
+     "start_time": "2026-02-25T21:24:46.917179",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Top orders is the month number 11, Peaking at 771598.0 orders\n"
+     ]
+    }
+   ],
+   "source": [
+    "print(f\"Top orders is the month number {df_sales_month_qtt_sorted.iloc[0].name}, Peaking at {df_sales_month_qtt_sorted.iloc[0][\"Quantity\"]} orders\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 32,
+   "id": "621945cb",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-02-25T21:24:46.956097Z",
+     "iopub.status.busy": "2026-02-25T21:24:46.955750Z",
+     "iopub.status.idle": "2026-02-25T21:24:47.019223Z",
+     "shell.execute_reply": "2026-02-25T21:24:47.017809Z"
+    },
+    "papermill": {
+     "duration": 0.076681,
+     "end_time": "2026-02-25T21:24:47.021743",
+     "exception": false,
+     "start_time": "2026-02-25T21:24:46.945062",
      "status": "completed"
     },
     "tags": []
@@ -1090,35 +2624,49 @@
     {
      "data": {
       "text/plain": [
-       "np.float64(5469455.93)"
+       "InvoiceDate\n",
+       "2010-12     823746.140\n",
+       "2011-01     691364.560\n",
+       "2011-02     523631.890\n",
+       "2011-03     717639.360\n",
+       "2011-04     537808.621\n",
+       "2011-05     770536.020\n",
+       "2011-06     761739.900\n",
+       "2011-07     719221.191\n",
+       "2011-08     737014.260\n",
+       "2011-09    1058590.172\n",
+       "2011-10    1154979.300\n",
+       "2011-11    1509496.330\n",
+       "2011-12     638792.680\n",
+       "Freq: M, Name: Spent, dtype: float64"
       ]
      },
-     "execution_count": 11,
+     "execution_count": 32,
      "metadata": {},
      "output_type": "execute_result"
     }
    ],
    "source": [
-    "sTotal = nTop[\"Spent\"].sum()\n",
-    "sTotal"
+    "df_rev_monthly = df_sales.groupby(df_sales[\"InvoiceDate\"].dt.to_period(\"M\"))[\"Spent\"].sum()\n",
+    "df_rev_monthly"
    ]
   },
   {
    "cell_type": "code",
-   "execution_count": 12,
-   "id": "30258227",
+   "execution_count": 33,
+   "id": "1631fdb9",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2026-02-25T18:53:32.819568Z",
-     "iopub.status.busy": "2026-02-25T18:53:32.818672Z",
-     "iopub.status.idle": "2026-02-25T18:53:32.825717Z",
-     "shell.execute_reply": "2026-02-25T18:53:32.824899Z"
+     "iopub.execute_input": "2026-02-25T21:24:47.042971Z",
+     "iopub.status.busy": "2026-02-25T21:24:47.042605Z",
+     "iopub.status.idle": "2026-02-25T21:24:47.054661Z",
+     "shell.execute_reply": "2026-02-25T21:24:47.053450Z"
     },
     "papermill": {
-     "duration": 0.01425,
-     "end_time": "2026-02-25T18:53:32.827584",
+     "duration": 0.025605,
+     "end_time": "2026-02-25T21:24:47.057191",
      "exception": false,
-     "start_time": "2026-02-25T18:53:32.813334",
+     "start_time": "2026-02-25T21:24:47.031586",
      "status": "completed"
     },
     "tags": []
@@ -1127,91 +2675,68 @@
     {
      "data": {
       "text/plain": [
-       "np.float64(56.109944235658986)"
+       "InvoiceDate\n",
+       "2010-12     0.000000\n",
+       "2011-01   -16.070677\n",
+       "2011-02   -24.261103\n",
+       "2011-03    37.050354\n",
+       "2011-04   -25.058650\n",
+       "2011-05    43.273274\n",
+       "2011-06    -1.141559\n",
+       "2011-07    -5.581788\n",
+       "2011-08     2.473936\n",
+       "2011-09    43.632251\n",
+       "2011-10     9.105424\n",
+       "2011-11    30.694665\n",
+       "2011-12   -57.681733\n",
+       "Freq: M, Name: Spent, dtype: float64"
       ]
      },
-     "execution_count": 12,
+     "execution_count": 33,
      "metadata": {},
      "output_type": "execute_result"
     }
    ],
    "source": [
-    "percTotal = sTotal * 100 / df[\"Spent\"].sum()\n",
-    "percTotal"
+    "rev_growth_monthly = df_rev_monthly.pct_change().fillna(0)\n",
+    "rev_growth_monthly*100"
    ]
   },
   {
    "cell_type": "code",
-   "execution_count": 13,
-   "id": "bd172928",
+   "execution_count": 34,
+   "id": "dfb53f76",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2026-02-25T18:53:32.838317Z",
-     "iopub.status.busy": "2026-02-25T18:53:32.837459Z",
-     "iopub.status.idle": "2026-02-25T18:53:32.843531Z",
-     "shell.execute_reply": "2026-02-25T18:53:32.842702Z"
+     "iopub.execute_input": "2026-02-25T21:24:47.078408Z",
+     "iopub.status.busy": "2026-02-25T21:24:47.078055Z",
+     "iopub.status.idle": "2026-02-25T21:24:47.100606Z",
+     "shell.execute_reply": "2026-02-25T21:24:47.099417Z"
     },
     "papermill": {
-     "duration": 0.01323,
-     "end_time": "2026-02-25T18:53:32.845310",
+     "duration": 0.035379,
+     "end_time": "2026-02-25T21:24:47.102883",
      "exception": false,
-     "start_time": "2026-02-25T18:53:32.832080",
+     "start_time": "2026-02-25T21:24:47.067504",
      "status": "completed"
     },
     "tags": []
    },
    "outputs": [
     {
-     "data": {
-      "text/plain": [
-       "np.float64(4027430.56)"
-      ]
-     },
-     "execution_count": 13,
-     "metadata": {},
-     "output_type": "execute_result"
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "The business is moving by 0.2591% every month over 13 months\n"
+     ]
     }
    ],
    "source": [
-    "sTotalNoAnon = nTopNoAnon[\"Spent\"].sum()\n",
-    "sTotalNoAnon"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 14,
-   "id": "af525a04",
-   "metadata": {
-    "execution": {
-     "iopub.execute_input": "2026-02-25T18:53:32.855965Z",
-     "iopub.status.busy": "2026-02-25T18:53:32.855315Z",
-     "iopub.status.idle": "2026-02-25T18:53:32.862156Z",
-     "shell.execute_reply": "2026-02-25T18:53:32.861295Z"
-    },
-    "papermill": {
-     "duration": 0.014374,
-     "end_time": "2026-02-25T18:53:32.864032",
-     "exception": false,
-     "start_time": "2026-02-25T18:53:32.849658",
-     "status": "completed"
-    },
-    "tags": []
-   },
-   "outputs": [
-    {
-     "data": {
-      "text/plain": [
-       "np.float64(41.31652343976174)"
-      ]
-     },
-     "execution_count": 14,
-     "metadata": {},
-     "output_type": "execute_result"
-    }
-   ],
-   "source": [
-    "percTotalNoAnon = sTotalNoAnon * 100 / df[\"Spent\"].sum()\n",
-    "percTotalNoAnon"
+    "x = np.arange(len(rev_growth_monthly))\n",
+    "y = rev_growth_monthly.values\n",
+    "\n",
+    "slope = np.polyfit(x, y, 1)[0]\n",
+    "print(f\"The business is moving by {slope*100:.4f}% every month over {len(rev_growth_monthly)} months\")"
    ]
   }
  ],
@@ -1251,14 +2776,14 @@
   },
   "papermill": {
    "default_parameters": {},
-   "duration": 8.0542,
-   "end_time": "2026-02-25T18:53:33.387061",
+   "duration": 10.136296,
+   "end_time": "2026-02-25T21:24:47.632872",
    "environment_variables": {},
    "exception": null,
    "input_path": "__notebook__.ipynb",
    "output_path": "__notebook__.ipynb",
    "parameters": {},
-   "start_time": "2026-02-25T18:53:25.332861",
+   "start_time": "2026-02-25T21:24:37.496576",
    "version": "2.6.0"
   }
  },
