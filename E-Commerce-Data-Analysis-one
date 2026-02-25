@@ -1,0 +1,805 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "id": "adda16ab",
+   "metadata": {
+    "_cell_guid": "b1076dfc-b9ad-4769-8c92-a6c4dae69d19",
+    "_uuid": "8f2839f25d086af736a60e9eeb907d3b93b6e0e5",
+    "execution": {
+     "iopub.execute_input": "2026-02-25T17:39:08.906066Z",
+     "iopub.status.busy": "2026-02-25T17:39:08.905390Z",
+     "iopub.status.idle": "2026-02-25T17:39:09.953126Z",
+     "shell.execute_reply": "2026-02-25T17:39:09.952002Z"
+    },
+    "papermill": {
+     "duration": 1.054382,
+     "end_time": "2026-02-25T17:39:09.955210",
+     "exception": false,
+     "start_time": "2026-02-25T17:39:08.900828",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "/kaggle/input/ecommerce-data/data.csv\n"
+     ]
+    }
+   ],
+   "source": [
+    "import numpy as np # linear algebra\n",
+    "import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)\n",
+    "\n",
+    "import os\n",
+    "for dirname, _, filenames in os.walk('/kaggle/input'):\n",
+    "    for filename in filenames:\n",
+    "        print(os.path.join(dirname, filename))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "id": "dfe262de",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-02-25T17:39:09.961844Z",
+     "iopub.status.busy": "2026-02-25T17:39:09.961207Z",
+     "iopub.status.idle": "2026-02-25T17:39:11.255305Z",
+     "shell.execute_reply": "2026-02-25T17:39:11.254558Z"
+    },
+    "papermill": {
+     "duration": 1.299472,
+     "end_time": "2026-02-25T17:39:11.257170",
+     "exception": false,
+     "start_time": "2026-02-25T17:39:09.957698",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>InvoiceNo</th>\n",
+       "      <th>StockCode</th>\n",
+       "      <th>Description</th>\n",
+       "      <th>Quantity</th>\n",
+       "      <th>InvoiceDate</th>\n",
+       "      <th>UnitPrice</th>\n",
+       "      <th>CustomerID</th>\n",
+       "      <th>Country</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>536365</td>\n",
+       "      <td>85123A</td>\n",
+       "      <td>WHITE HANGING HEART T-LIGHT HOLDER</td>\n",
+       "      <td>6</td>\n",
+       "      <td>12/1/2010 8:26</td>\n",
+       "      <td>2.55</td>\n",
+       "      <td>17850.0</td>\n",
+       "      <td>United Kingdom</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>536365</td>\n",
+       "      <td>71053</td>\n",
+       "      <td>WHITE METAL LANTERN</td>\n",
+       "      <td>6</td>\n",
+       "      <td>12/1/2010 8:26</td>\n",
+       "      <td>3.39</td>\n",
+       "      <td>17850.0</td>\n",
+       "      <td>United Kingdom</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>536365</td>\n",
+       "      <td>84406B</td>\n",
+       "      <td>CREAM CUPID HEARTS COAT HANGER</td>\n",
+       "      <td>8</td>\n",
+       "      <td>12/1/2010 8:26</td>\n",
+       "      <td>2.75</td>\n",
+       "      <td>17850.0</td>\n",
+       "      <td>United Kingdom</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>536365</td>\n",
+       "      <td>84029G</td>\n",
+       "      <td>KNITTED UNION FLAG HOT WATER BOTTLE</td>\n",
+       "      <td>6</td>\n",
+       "      <td>12/1/2010 8:26</td>\n",
+       "      <td>3.39</td>\n",
+       "      <td>17850.0</td>\n",
+       "      <td>United Kingdom</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>536365</td>\n",
+       "      <td>84029E</td>\n",
+       "      <td>RED WOOLLY HOTTIE WHITE HEART.</td>\n",
+       "      <td>6</td>\n",
+       "      <td>12/1/2010 8:26</td>\n",
+       "      <td>3.39</td>\n",
+       "      <td>17850.0</td>\n",
+       "      <td>United Kingdom</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>...</th>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>541904</th>\n",
+       "      <td>581587</td>\n",
+       "      <td>22613</td>\n",
+       "      <td>PACK OF 20 SPACEBOY NAPKINS</td>\n",
+       "      <td>12</td>\n",
+       "      <td>12/9/2011 12:50</td>\n",
+       "      <td>0.85</td>\n",
+       "      <td>12680.0</td>\n",
+       "      <td>France</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>541905</th>\n",
+       "      <td>581587</td>\n",
+       "      <td>22899</td>\n",
+       "      <td>CHILDREN'S APRON DOLLY GIRL</td>\n",
+       "      <td>6</td>\n",
+       "      <td>12/9/2011 12:50</td>\n",
+       "      <td>2.10</td>\n",
+       "      <td>12680.0</td>\n",
+       "      <td>France</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>541906</th>\n",
+       "      <td>581587</td>\n",
+       "      <td>23254</td>\n",
+       "      <td>CHILDRENS CUTLERY DOLLY GIRL</td>\n",
+       "      <td>4</td>\n",
+       "      <td>12/9/2011 12:50</td>\n",
+       "      <td>4.15</td>\n",
+       "      <td>12680.0</td>\n",
+       "      <td>France</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>541907</th>\n",
+       "      <td>581587</td>\n",
+       "      <td>23255</td>\n",
+       "      <td>CHILDRENS CUTLERY CIRCUS PARADE</td>\n",
+       "      <td>4</td>\n",
+       "      <td>12/9/2011 12:50</td>\n",
+       "      <td>4.15</td>\n",
+       "      <td>12680.0</td>\n",
+       "      <td>France</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>541908</th>\n",
+       "      <td>581587</td>\n",
+       "      <td>22138</td>\n",
+       "      <td>BAKING SET 9 PIECE RETROSPOT</td>\n",
+       "      <td>3</td>\n",
+       "      <td>12/9/2011 12:50</td>\n",
+       "      <td>4.95</td>\n",
+       "      <td>12680.0</td>\n",
+       "      <td>France</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "<p>541909 rows × 8 columns</p>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "       InvoiceNo StockCode                          Description  Quantity  \\\n",
+       "0         536365    85123A   WHITE HANGING HEART T-LIGHT HOLDER         6   \n",
+       "1         536365     71053                  WHITE METAL LANTERN         6   \n",
+       "2         536365    84406B       CREAM CUPID HEARTS COAT HANGER         8   \n",
+       "3         536365    84029G  KNITTED UNION FLAG HOT WATER BOTTLE         6   \n",
+       "4         536365    84029E       RED WOOLLY HOTTIE WHITE HEART.         6   \n",
+       "...          ...       ...                                  ...       ...   \n",
+       "541904    581587     22613          PACK OF 20 SPACEBOY NAPKINS        12   \n",
+       "541905    581587     22899         CHILDREN'S APRON DOLLY GIRL          6   \n",
+       "541906    581587     23254        CHILDRENS CUTLERY DOLLY GIRL          4   \n",
+       "541907    581587     23255      CHILDRENS CUTLERY CIRCUS PARADE         4   \n",
+       "541908    581587     22138        BAKING SET 9 PIECE RETROSPOT          3   \n",
+       "\n",
+       "            InvoiceDate  UnitPrice  CustomerID         Country  \n",
+       "0        12/1/2010 8:26       2.55     17850.0  United Kingdom  \n",
+       "1        12/1/2010 8:26       3.39     17850.0  United Kingdom  \n",
+       "2        12/1/2010 8:26       2.75     17850.0  United Kingdom  \n",
+       "3        12/1/2010 8:26       3.39     17850.0  United Kingdom  \n",
+       "4        12/1/2010 8:26       3.39     17850.0  United Kingdom  \n",
+       "...                 ...        ...         ...             ...  \n",
+       "541904  12/9/2011 12:50       0.85     12680.0          France  \n",
+       "541905  12/9/2011 12:50       2.10     12680.0          France  \n",
+       "541906  12/9/2011 12:50       4.15     12680.0          France  \n",
+       "541907  12/9/2011 12:50       4.15     12680.0          France  \n",
+       "541908  12/9/2011 12:50       4.95     12680.0          France  \n",
+       "\n",
+       "[541909 rows x 8 columns]"
+      ]
+     },
+     "execution_count": 2,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df = pd.read_csv('/kaggle/input/ecommerce-data/data.csv', encoding='unicode_escape')\n",
+    "df"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "id": "49f035ef",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-02-25T17:39:11.264683Z",
+     "iopub.status.busy": "2026-02-25T17:39:11.263796Z",
+     "iopub.status.idle": "2026-02-25T17:39:11.281817Z",
+     "shell.execute_reply": "2026-02-25T17:39:11.280900Z"
+    },
+    "papermill": {
+     "duration": 0.023974,
+     "end_time": "2026-02-25T17:39:11.283897",
+     "exception": false,
+     "start_time": "2026-02-25T17:39:11.259923",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Quantity</th>\n",
+       "      <th>UnitPrice</th>\n",
+       "      <th>CustomerID</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>6</td>\n",
+       "      <td>2.55</td>\n",
+       "      <td>17850.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>6</td>\n",
+       "      <td>3.39</td>\n",
+       "      <td>17850.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>8</td>\n",
+       "      <td>2.75</td>\n",
+       "      <td>17850.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>6</td>\n",
+       "      <td>3.39</td>\n",
+       "      <td>17850.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>6</td>\n",
+       "      <td>3.39</td>\n",
+       "      <td>17850.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>...</th>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>541904</th>\n",
+       "      <td>12</td>\n",
+       "      <td>0.85</td>\n",
+       "      <td>12680.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>541905</th>\n",
+       "      <td>6</td>\n",
+       "      <td>2.10</td>\n",
+       "      <td>12680.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>541906</th>\n",
+       "      <td>4</td>\n",
+       "      <td>4.15</td>\n",
+       "      <td>12680.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>541907</th>\n",
+       "      <td>4</td>\n",
+       "      <td>4.15</td>\n",
+       "      <td>12680.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>541908</th>\n",
+       "      <td>3</td>\n",
+       "      <td>4.95</td>\n",
+       "      <td>12680.0</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "<p>541909 rows × 3 columns</p>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "        Quantity  UnitPrice  CustomerID\n",
+       "0              6       2.55     17850.0\n",
+       "1              6       3.39     17850.0\n",
+       "2              8       2.75     17850.0\n",
+       "3              6       3.39     17850.0\n",
+       "4              6       3.39     17850.0\n",
+       "...          ...        ...         ...\n",
+       "541904        12       0.85     12680.0\n",
+       "541905         6       2.10     12680.0\n",
+       "541906         4       4.15     12680.0\n",
+       "541907         4       4.15     12680.0\n",
+       "541908         3       4.95     12680.0\n",
+       "\n",
+       "[541909 rows x 3 columns]"
+      ]
+     },
+     "execution_count": 3,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "data = df.drop(columns=[\"InvoiceNo\",\"StockCode\",\"Description\",\"InvoiceDate\",\"Country\"])\n",
+    "data"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "id": "8f3c7a40",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-02-25T17:39:11.291246Z",
+     "iopub.status.busy": "2026-02-25T17:39:11.290527Z",
+     "iopub.status.idle": "2026-02-25T17:39:11.323722Z",
+     "shell.execute_reply": "2026-02-25T17:39:11.322562Z"
+    },
+    "papermill": {
+     "duration": 0.039108,
+     "end_time": "2026-02-25T17:39:11.325796",
+     "exception": false,
+     "start_time": "2026-02-25T17:39:11.286688",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Quantity</th>\n",
+       "      <th>UnitPrice</th>\n",
+       "      <th>CustomerID</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>6</td>\n",
+       "      <td>2.55</td>\n",
+       "      <td>17850.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>6</td>\n",
+       "      <td>3.39</td>\n",
+       "      <td>17850.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>8</td>\n",
+       "      <td>2.75</td>\n",
+       "      <td>17850.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>6</td>\n",
+       "      <td>3.39</td>\n",
+       "      <td>17850.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>6</td>\n",
+       "      <td>3.39</td>\n",
+       "      <td>17850.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>...</th>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>541904</th>\n",
+       "      <td>12</td>\n",
+       "      <td>0.85</td>\n",
+       "      <td>12680.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>541905</th>\n",
+       "      <td>6</td>\n",
+       "      <td>2.10</td>\n",
+       "      <td>12680.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>541906</th>\n",
+       "      <td>4</td>\n",
+       "      <td>4.15</td>\n",
+       "      <td>12680.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>541907</th>\n",
+       "      <td>4</td>\n",
+       "      <td>4.15</td>\n",
+       "      <td>12680.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>541908</th>\n",
+       "      <td>3</td>\n",
+       "      <td>4.95</td>\n",
+       "      <td>12680.0</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "<p>406829 rows × 3 columns</p>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "        Quantity  UnitPrice  CustomerID\n",
+       "0              6       2.55     17850.0\n",
+       "1              6       3.39     17850.0\n",
+       "2              8       2.75     17850.0\n",
+       "3              6       3.39     17850.0\n",
+       "4              6       3.39     17850.0\n",
+       "...          ...        ...         ...\n",
+       "541904        12       0.85     12680.0\n",
+       "541905         6       2.10     12680.0\n",
+       "541906         4       4.15     12680.0\n",
+       "541907         4       4.15     12680.0\n",
+       "541908         3       4.95     12680.0\n",
+       "\n",
+       "[406829 rows x 3 columns]"
+      ]
+     },
+     "execution_count": 4,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "data.dropna()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "id": "4cfbce14",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-02-25T17:39:11.333918Z",
+     "iopub.status.busy": "2026-02-25T17:39:11.333168Z",
+     "iopub.status.idle": "2026-02-25T17:39:11.353142Z",
+     "shell.execute_reply": "2026-02-25T17:39:11.352192Z"
+    },
+    "papermill": {
+     "duration": 0.026265,
+     "end_time": "2026-02-25T17:39:11.355154",
+     "exception": false,
+     "start_time": "2026-02-25T17:39:11.328889",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array([17850., 13047., 12583., ..., 13298., 14569., 12713.])"
+      ]
+     },
+     "execution_count": 5,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "Customers = data[\"CustomerID\"].unique()\n",
+    "Customers"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "id": "a13ca40c",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-02-25T17:39:11.363930Z",
+     "iopub.status.busy": "2026-02-25T17:39:11.363633Z",
+     "iopub.status.idle": "2026-02-25T17:39:15.267575Z",
+     "shell.execute_reply": "2026-02-25T17:39:15.266682Z"
+    },
+    "papermill": {
+     "duration": 3.910325,
+     "end_time": "2026-02-25T17:39:15.269814",
+     "exception": false,
+     "start_time": "2026-02-25T17:39:11.359489",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "CustomerMoneySpend = {}\n",
+    "for customerID in Customers:\n",
+    "    Customer = data.loc[data[\"CustomerID\"] == customerID]\n",
+    "    CustomerMoneySpend[customerID] = (Customer[\"Quantity\"] * Customer[\"UnitPrice\"]).sum()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "id": "6ef1b064",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-02-25T17:39:15.277673Z",
+     "iopub.status.busy": "2026-02-25T17:39:15.277016Z",
+     "iopub.status.idle": "2026-02-25T17:39:15.284927Z",
+     "shell.execute_reply": "2026-02-25T17:39:15.284098Z"
+    },
+    "papermill": {
+     "duration": 0.013772,
+     "end_time": "2026-02-25T17:39:15.286674",
+     "exception": false,
+     "start_time": "2026-02-25T17:39:15.272902",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "CustomerMoneySpend = dict(sorted(CustomerMoneySpend.items(), key = lambda item: item[1], reverse=True))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "id": "ddd2187f",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-02-25T17:39:15.293902Z",
+     "iopub.status.busy": "2026-02-25T17:39:15.293493Z",
+     "iopub.status.idle": "2026-02-25T17:39:15.299906Z",
+     "shell.execute_reply": "2026-02-25T17:39:15.298932Z"
+    },
+    "papermill": {
+     "duration": 0.012155,
+     "end_time": "2026-02-25T17:39:15.301659",
+     "exception": false,
+     "start_time": "2026-02-25T17:39:15.289504",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "np.float64(8300065.813999991)"
+      ]
+     },
+     "execution_count": 8,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "TotalMoney = sum(CustomerMoneySpend.values())\n",
+    "TotalMoney"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "id": "d5d36e97",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-02-25T17:39:15.309206Z",
+     "iopub.status.busy": "2026-02-25T17:39:15.308777Z",
+     "iopub.status.idle": "2026-02-25T17:39:15.315221Z",
+     "shell.execute_reply": "2026-02-25T17:39:15.314548Z"
+    },
+    "papermill": {
+     "duration": 0.012446,
+     "end_time": "2026-02-25T17:39:15.317080",
+     "exception": false,
+     "start_time": "2026-02-25T17:39:15.304634",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "np.float64(77524.0)"
+      ]
+     },
+     "execution_count": 9,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "FivePercentContribution = sum(dict(list(CustomerMoneySpend.items())[:5])) \n",
+    "FivePercentContribution"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 10,
+   "id": "d416b21e",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-02-25T17:39:15.325130Z",
+     "iopub.status.busy": "2026-02-25T17:39:15.324824Z",
+     "iopub.status.idle": "2026-02-25T17:39:15.330659Z",
+     "shell.execute_reply": "2026-02-25T17:39:15.329669Z"
+    },
+    "papermill": {
+     "duration": 0.012261,
+     "end_time": "2026-02-25T17:39:15.332441",
+     "exception": false,
+     "start_time": "2026-02-25T17:39:15.320180",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "np.float64(0.9340166901958505)"
+      ]
+     },
+     "execution_count": 10,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "PersentageContributed = FivePercentContribution*100/TotalMoney\n",
+    "PersentageContributed"
+   ]
+  }
+ ],
+ "metadata": {
+  "kaggle": {
+   "accelerator": "none",
+   "dataSources": [
+    {
+     "databundleVersionId": 3404,
+     "datasetId": 1985,
+     "sourceId": 3404,
+     "sourceType": "datasetVersion"
+    }
+   ],
+   "dockerImageVersionId": 31286,
+   "isGpuEnabled": false,
+   "isInternetEnabled": false,
+   "language": "python",
+   "sourceType": "notebook"
+  },
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.12.12"
+  },
+  "papermill": {
+   "default_parameters": {},
+   "duration": 10.038126,
+   "end_time": "2026-02-25T17:39:15.855222",
+   "environment_variables": {},
+   "exception": null,
+   "input_path": "__notebook__.ipynb",
+   "output_path": "__notebook__.ipynb",
+   "parameters": {},
+   "start_time": "2026-02-25T17:39:05.817096",
+   "version": "2.6.0"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
